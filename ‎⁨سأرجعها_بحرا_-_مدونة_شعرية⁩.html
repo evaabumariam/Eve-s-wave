@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سأرجعها بحرا | سِجلّ الشعر والأدب</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ocean: '#1d4ed8',
+                        deepblue: '#1e3a8a',
+                        softblue: '#3b82f6',
+                        paper: '#fcfbf9'
+                    },
+                    fontFamily: {
+                        arabic: ['Amiri', 'serif'],
+                        english: ['Lora', 'Georgia', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fcfbf9;
+            color: #1e293b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between font-sans selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Top Navigation / Language Switcher Header -->
+    <header class="w-full max-w-2xl mx-auto px-6 pt-12 pb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 class="text-2xl sm:text-3xl font-bold font-arabic text-deepblue tracking-wide">
+            سأرجعها بحرا
+        </h1>
+        <div class="flex items-center gap-3 text-sm">
+            <button onclick="switchLang('ar')" id="btn-ar" class="px-3 py-1 font-arabic transition-all border-b-2 border-deepblue text-deepblue font-bold">
+                عربي
+            </button>
+            <span class="text-gray-300">/</span>
+            <button onclick="switchLang('en')" id="btn-en" class="px-3 py-1 font-english transition-all border-b-2 border-transparent text-gray-500 hover:text-deepblue">
+                English
+            </button>
+        </div>
+    </header>
+
+    <!-- Straight Horizontal Dividing Line -->
+    <div class="w-full max-w-2xl mx-auto px-6">
+        <hr class="border-t border-deepblue opacity-30 my-2">
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-2xl mx-auto px-6 py-8 flex-grow">
+
+        <!-- Dashboard Control Toggle Button -->
+        <div class="flex justify-end mb-6">
+            <button onclick="toggleDashboard()" id="dash-toggle-btn" class="text-xs font-sans tracking-wide text-deepblue hover:underline border border-deepblue/30 px-3 py-1 rounded transition-all">
+                ✦ لوحة التحكم / Control Panel
+            </button>
+        </div>
+
+        <!-- Dashboard Panel (Hidden by default) -->
+        <div id="dashboard-panel" class="hidden mb-12 p-6 bg-white border border-gray-200 rounded-lg shadow-sm space-y-6">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold font-arabic text-deepblue text-lg">إدارة النصوص الشعرية</h3>
+                <span class="text-xs text-gray-400">إضافة أو تعديل أو حذف</span>
+            </div>
+
+            <form id="poem-form" onsubmit="handlePoemSubmit(event)" class="space-y-4">
+                <input type="hidden" id="poem-id">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">القسم / Section</label>
+                        <select id="poem-lang" class="w-full text-sm border border-gray-300 rounded p-2 focus:border-deepblue focus:outline-none">
+                            <option value="ar">عربي (Arabic)</option>
+                            <option value="en">English (إنجليزي)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">السنة / Date / Year</label>
+                        <input type="text" id="poem-year" placeholder="مثال: ٢٠٢٦ / 2026" required class="w-full text-sm border border-gray-300 rounded p-2 focus:border-deepblue focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">عنوان النص / Poem Title</label>
+                    <input type="text" id="poem-title" placeholder="عنوان القصيدة..." required class="w-full text-sm border border-gray-300 rounded p-2 focus:border-deepblue focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">أبيات النص (كل سطر في سطر منفصل) / Poem Content</label>
+                    <textarea id="poem-content" rows="6" placeholder="اكتب أبيات القصيدة هنا..." required class="w-full text-sm border border-gray-300 rounded p-2 focus:border-deepblue focus:outline-none font-arabic"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="resetForm()" class="px-4 py-2 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-all">إلغاء</button>
+                    <button type="submit" id="submit-btn" class="px-4 py-2 text-xs bg-deepblue text-white rounded hover:bg-blue-900 transition-all">حفظ ونشر النص</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ARABIC SECTION -->
+        <section id="section-ar" class="space-y-16 fade-in">
+            <div class="text-center mb-10">
+                <p class="text-xs uppercase tracking-widest text-deepblue font-semibold mb-1">مدونة شعرية</p>
+                <h2 class="text-xl font-arabic text-gray-800">حيث تصبح الكلمات موجاً</h2>
+            </div>
+
+            <!-- Dynamic Arabic Poems Container -->
+            <div id="arabic-poems-container" class="space-y-16">
+                <!-- Rendered dynamically via JS -->
+            </div>
+
+            <!-- Bio Section Arabic -->
+            <div class="mt-20 pt-10 border-t border-gray-200 space-y-6">
+                <h3 class="text-lg font-arabic font-bold text-deepblue text-center">عن الشاعرة</h3>
+                <p class="font-arabic text-base leading-relaxed text-gray-700 text-justify">
+                    إيفا أبو مريم؛ شاعِرة وكاتبة فلسطينية من غزة، التحقت في جامعة الأزهر/غزّة، وتتلقى تعليمها في كلّية طب الأسنان. صدرت لها مجلّة "Last Eve in Gaza" ضمن مشروع costal lines press وتمّت ترجمته إلى اللغتين العربية والألمانيّة. عضو في مجلة «We Are Not Numbers»، كما نُشرت أعمالها في عدد من المجلات والكتب الأدبية، منها Impulse وThe Dodge وكتاب «غزة تروي إبادتها» الصادر لمؤسسة الدراسات الفلسطينية. تكتُب من وحيِ التجارب الإنسانيّة، العاطفيّة العميقَة، عن نفسِها وبلادِها وحزنهِما المرفرِف. في عالَمٍ مُتشتت الهويّة، ترَى في الشِّعر والأدَب صوتهَا الخاص.
+                </p>
+            </div>
+        </section>
+
+        <!-- ENGLISH SECTION -->
+        <section id="section-en" class="space-y-16 hidden fade-in" dir="ltr">
+            <div class="text-center mb-10">
+                <p class="text-xs uppercase tracking-widest text-deepblue font-semibold mb-1">Poetry Zine</p>
+                <h2 class="text-xl font-english italic text-gray-800">Where words become tides</h2>
+            </div>
+
+            <!-- Dynamic English Poems Container -->
+            <div id="english-poems-container" class="space-y-16">
+                <!-- Rendered dynamically via JS -->
+            </div>
+
+            <!-- Bio Section English -->
+            <div class="mt-20 pt-10 border-t border-gray-200 space-y-6">
+                <h3 class="text-lg font-english font-semibold text-deepblue text-center">About the Author</h3>
+                <p class="font-english text-base leading-relaxed text-gray-700 text-justify">
+                    Eve: 20-years-old poet, storyteller, and dentistry student at Al-Azhar University. She is born and raised in the city of her inspiration, Gaza. Living through the woes of the genocide has got her to launch her zine “last Eve in Gaza”, Published by Coastal Lines Press. Eva writes about the deep emotional human experiences observing them through herself and her grief. In a world of Wars and shattered identities, poetry and literature are the only voice she has and the most loud one.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Straight Horizontal Dividing Line at Bottom -->
+    <div class="w-full max-w-2xl mx-auto px-6">
+        <hr class="border-t border-deepblue opacity-30 my-4">
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-2xl mx-auto px-6 py-6 text-center text-xs text-gray-500 font-sans">
+        <p>© سأرجعها بحرا — Eve / ايڤ. All rights reserved.</p>
+    </footer>
+
+    <!-- Script to handle Language Switching and Poem CRUD in localStorage -->
+    <script>
+        // Initial Default Poems if localStorage is empty
+        const defaultPoems = [
+            {
+                id: '1',
+                lang: 'ar',
+                title: 'غزة، في العتمة الأولى',
+                year: '٢٠٢٦',
+                content: 'أنا ابنةُ الموجِ حين يخاصمُ الشاطئ\nأحملُ في صدري ركاماً من ياسمين وبرتقال\nيقولون لي: تنسين؟\nفكيف ينسى النبضُ إيقاعَ دمهِ؟\nوكيف للريحِ أن تستريحَ وأنا هنا\nأحرسُ ظلالَ الحكايا قبل أن ترحل؟'
+            },
+            {
+                id: '2',
+                lang: 'ar',
+                title: 'أثر الحزن الجميل',
+                year: '٢٠٢٥',
+                content: 'أكتبُ لأن الكلماتِ وحدها لا تنكسر\nولأنني إن متُّ قبل أن أروي قصتي\nفإن الحجارةَ ستتكلمُ بلغتي\nوالبحرُ سيرددُ اسمي مع كل مدٍّ وجزر.'
+            },
+            {
+                id: '3',
+                lang: 'en',
+                title: 'The First Shore',
+                year: '2026',
+                content: 'I am the daughter of waves defying the shore\nCarrying within my chest rubble made of jasmine and oranges\nThey ask me: Will you forget?\nHow can the pulse ever forget the rhythm of its own blood?\nAnd how can the wind rest while I stand here\nGuarding the shadows of stories before they fade?'
+            },
+            {
+                id: '4',
+                lang: 'en',
+                title: 'Traces of Grief',
+                year: '2025',
+                content: 'I write because words alone do not shatter\nAnd because if I perish before telling my story\nThe very stones will speak in my language\nAnd the sea will echo my name with every rising tide.'
+            }
+        ];
+
+        function getPoems() {
+            const stored = localStorage.getItem('sajirouha_poems');
+            if (!stored) {
+                localStorage.setItem('sajirouha_poems', JSON.stringify(defaultPoems));
+                return defaultPoems;
+            }
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                return defaultPoems;
+            }
+        }
+
+        function savePoems(poems) {
+            localStorage.setItem('sajirouha_poems', JSON.stringify(poems));
+        }
+
+        function toggleDashboard() {
+            const panel = document.getElementById('dashboard-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function switchLang(lang) {
+            const secAr = document.getElementById('section-ar');
+            const secEn = document.getElementById('section-en');
+            const btnAr = document.getElementById('btn-ar');
+            const btnEn = document.getElementById('btn-en');
+            const htmlTag = document.documentElement;
+
+            if (lang === 'ar') {
+                secAr.classList.remove('hidden');
+                secEn.classList.add('hidden');
+                
+                btnAr.className = "px-3 py-1 font-arabic transition-all border-b-2 border-deepblue text-deepblue font-bold";
+                btnEn.className = "px-3 py-1 font-english transition-all border-b-2 border-transparent text-gray-500 hover:text-deepblue";
+                
+                htmlTag.setAttribute('dir', 'rtl');
+                htmlTag.setAttribute('lang', 'ar');
+            } else {
+                secEn.classList.remove('hidden');
+                secAr.classList.add('hidden');
+                
+                btnEn.className = "px-3 py-1 font-english transition-all border-b-2 border-deepblue text-deepblue font-bold";
+                btnAr.className = "px-3 py-1 font-arabic transition-all border-b-2 border-transparent text-gray-500 hover:text-deepblue";
+                
+                htmlTag.setAttribute('dir', 'ltr');
+                htmlTag.setAttribute('lang', 'en');
+            }
+        }
+
+        function renderPoems() {
+            const poems = getPoems();
+            const arContainer = document.getElementById('arabic-poems-container');
+            const enContainer = document.getElementById('english-poems-container');
+
+            arContainer.innerHTML = '';
+            enContainer.innerHTML = '';
+
+            const arPoems = poems.filter(p => p.lang === 'ar');
+            const enPoems = poems.filter(p => p.lang === 'en');
+
+            // Render Arabic Poems
+            if (arPoems.length === 0) {
+                arContainer.innerHTML = '<p class="text-center text-gray-400 font-arabic text-sm">لا توجد نصوص منشورة بعد.</p>';
+            } else {
+                arPoems.forEach((poem, index) => {
+                    const linesHtml = poem.content.split('\n').map(line => `<p>${line || '&nbsp;'}</p>`).join('');
+                    const article = document.createElement('article');
+                    article.className = "space-y-6 relative group";
+                    article.innerHTML = `
+                        <div class="text-center">
+                            <h3 class="text-lg font-arabic font-bold text-deepblue">${escapeHtml(poem.title)}</h3>
+                            <span class="text-xs text-gray-400 font-sans">${escapeHtml(poem.year)}</span>
+                        </div>
+                        <div class="font-arabic text-lg sm:text-xl leading-loose text-center text-gray-800 space-y-3">
+                            ${linesHtml}
+                        </div>
+                        <!-- Admin controls overlay -->
+                        <div class="flex justify-center items-center gap-4 pt-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <button onclick="editPoem('${poem.id}')" class="text-xs text-blue-600 hover:underline">تعديل</button>
+                            <span class="text-gray-300">|</span>
+                            <button onclick="deletePoem('${poem.id}')" class="text-xs text-red-500 hover:underline">حذف</button>
+                        </div>
+                        ${index < arPoems.length - 1 ? '<div class="w-24 mx-auto border-t border-gray-300 opacity-50 my-10"></div>' : ''}
+                    `;
+                    arContainer.appendChild(article);
+                });
+            }
+
+            // Render English Poems
+            if (enPoems.length === 0) {
+                enContainer.innerHTML = '<p class="text-center text-gray-400 font-english text-sm">No poems published yet.</p>';
+            } else {
+                enPoems.forEach((poem, index) => {
+                    const linesHtml = poem.content.split('\n').map(line => `<p>${line || '&nbsp;'}</p>`).join('');
+                    const article = document.createElement('article');
+                    article.className = "space-y-6 relative group";
+                    article.innerHTML = `
+                        <div class="text-center">
+                            <h3 class="text-lg font-english font-semibold text-deepblue">${escapeHtml(poem.title)}</h3>
+                            <span class="text-xs text-gray-400 font-sans">${escapeHtml(poem.year)}</span>
+                        </div>
+                        <div class="font-english text-lg sm:text-xl leading-loose text-center text-gray-800 space-y-3 italic">
+                            ${linesHtml}
+                        </div>
+                        <!-- Admin controls overlay -->
+                        <div class="flex justify-center items-center gap-4 pt-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <button onclick="editPoem('${poem.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
+                            <span class="text-gray-300">|</span>
+                            <button onclick="deletePoem('${poem.id}')" class="text-xs text-red-500 hover:underline">Delete</button>
+                        </div>
+                        ${index < enPoems.length - 1 ? '<div class="w-24 mx-auto border-t border-gray-300 opacity-50 my-10"></div>' : ''}
+                    `;
+                    enContainer.appendChild(article);
+                });
+            }
+        }
+
+        function handlePoemSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('poem-id').value;
+            const lang = document.getElementById('poem-lang').value;
+            const year = document.getElementById('poem-year').value;
+            const title = document.getElementById('poem-title').value;
+            const content = document.getElementById('poem-content').value;
+
+            let poems = getPoems();
+
+            if (id) {
+                // Edit existing
+                poems = poems.map(p => p.id === id ? { id, lang, year, title, content } : p);
+            } else {
+                // Add new
+                const newPoem = {
+                    id: Date.now().toString(),
+                    lang,
+                    year,
+                    title,
+                    content
+                };
+                poems.unshift(newPoem);
+            }
+
+            savePoems(poems);
+            renderPoems();
+            resetForm();
+            toggleDashboard(); // close panel after save
+        }
+
+        function editPoem(id) {
+            const poems = getPoems();
+            const poem = poems.find(p => p.id === id);
+            if (!poem) return;
+
+            document.getElementById('poem-id').value = poem.id;
+            document.getElementById('poem-lang').value = poem.lang;
+            document.getElementById('poem-year').value = poem.year;
+            document.getElementById('poem-title').value = poem.title;
+            document.getElementById('poem-content').value = poem.content;
+            document.getElementById('submit-btn').textContent = 'تحديث النص';
+
+            // Open panel if closed
+            const panel = document.getElementById('dashboard-panel');
+            panel.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deletePoem(id) {
+            if (confirm('هل أنت متأكد من حذف هذا النص؟ / Are you sure you want to delete this poem?')) {
+                let poems = getPoems();
+                poems = poems.filter(p => p.id !== id);
+                savePoems(poems);
+                renderPoems();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('poem-form').reset();
+            document.getElementById('poem-id').value = '';
+            document.getElementById('submit-btn').textContent = 'حفظ ونشر النص';
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderPoems();
+        };
+    </script>
+</body>
+</html>
